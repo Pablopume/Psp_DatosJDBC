@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Customer;
+import model.Order;
+import model.errors.CustomerError;
 import ui.screens.common.BaseScreenController;
 
 import java.time.LocalDate;
@@ -69,8 +71,46 @@ public class DeleteCustomersController extends BaseScreenController {
     }
 
     public void deleteCustomer(ActionEvent actionEvent) {
+        SelectionModel<Customer> selectionModel = customersTable.getSelectionModel();
+        Customer selectedCustomer = selectionModel.getSelectedItem();
+       if (deleteCustomerViewModel.getServices().delete(selectedCustomer.getId()).isLeft()){
+           Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+           alert.setTitle("You can't delete");
+           alert.setHeaderText(null);
+           alert.setContentText("There are orders created in that customer, do you want to delete them?");
+           Optional<ButtonType> result = alert.showAndWait();
+           if (result.isPresent() && result.get() == ButtonType.OK) {
+               ObservableList<Customer> customers = customersTable.getItems();
+               deleteCustomerViewModel.getServices().delete(selectedCustomer.getId());
+               customers.remove(selectedCustomer);
 
+
+           } else {
+           Alert alert2=new Alert(Alert.AlertType.INFORMATION);
+           alert2.setTitle("Delete cancelled");
+           alert2.setHeaderText(null);
+           alert2.setContentText("You cancelled the delete");
+           alert2.show();
+       }
+       }else {
+           Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+           confirmationAlert.setTitle("Confirm delete");
+           confirmationAlert.setHeaderText("Delete customer");
+           confirmationAlert.setContentText("Are you sure you want to delete this Customer?");
+           Optional<ButtonType> result = confirmationAlert.showAndWait();
+           if (result.isPresent() && result.get() == ButtonType.OK) {
+               deleteCustomerViewModel.getServices().delete(selectedCustomer.getId());
+               ObservableList<Customer> customers = customersTable.getItems();
+               customers.remove(selectedCustomer);
+               Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+               successAlert.setTitle("Customer deleted");
+               successAlert.setHeaderText(null);
+               successAlert.setContentText("The Customer has been deleted");
+               successAlert.showAndWait();
+           }
+       }
+       }
     }
 
-}
+
 

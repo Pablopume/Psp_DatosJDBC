@@ -33,5 +33,10 @@ public class ServicesCustomerImpl implements ServicesCustomer {
         return customerDAO.update(first_name, last_name, email, phone, dob, id);
     }
 
+    @Override
+    public Either<CustomerError, List<Customer>> delete(int id) {
+        return customerDAO.delete(id);
+    }
+
 }
 

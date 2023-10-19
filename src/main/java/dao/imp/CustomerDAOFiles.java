@@ -48,9 +48,14 @@ public class CustomerDAOFiles implements CustomerDAO {
         Either<CustomerError, List<Customer>> result=null;
         try (Connection myConnection = db.getConnection();
              PreparedStatement statement = myConnection.prepareStatement("delete from customers where id=?")) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
-            result = Either.right(readRS(statement.getResultSet()).get());
+            if(customerContainOrders(id)) {
+                result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
+            }
+            else {
+                statement.setInt(1, id);
+                statement.executeUpdate();
+                result = Either.right(getAll().get());
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
@@ -154,7 +159,22 @@ public class CustomerDAOFiles implements CustomerDAO {
         }
         return result;
     }
+    private boolean customerContainOrders(int id) {
+        boolean resultado=false;
+        try (Connection myConnection = db.getConnection();
+             Statement statement = myConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_READ_ONLY)) {
+            ResultSet rs = statement.executeQuery("select * orders where customer_id="+id);
+            if(rs.next()){
+                resultado=true;
+            }
 
+
+        } catch (SQLException e) {
+            SQLException ex = e.getNextException();
+        }
+        return resultado;
+    }
     private Either<CustomerError, List<Customer>> readRS(ResultSet rs) {
         Either<CustomerError, List<Customer>> either;
         try {

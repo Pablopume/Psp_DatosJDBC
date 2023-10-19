@@ -26,7 +26,12 @@ public class ServicesCustomerImpl implements ServicesCustomer {
     public Either<CustomerError, List<Customer>> getAll() {
         return customerDAO.getAll();
     }
-
+   public Either<CustomerError, Customer> add( String first_name, String last_name, String email, String phone, LocalDate dob){
+        return customerDAO.add(first_name, last_name, email, phone, dob);
+   }
+   public Either<CustomerError, List<Customer>> update( String first_name, String last_name, String email, String phone, LocalDate dob, int id){
+        return customerDAO.update(first_name, last_name, email, phone, dob, id);
+    }
 
 }
 

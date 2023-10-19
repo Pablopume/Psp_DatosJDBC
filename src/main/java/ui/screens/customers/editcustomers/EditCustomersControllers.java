@@ -93,7 +93,7 @@ public class EditCustomersControllers extends BaseScreenController {
         ObservableList<Customer> customers = customersTable.getItems();
         SelectionModel<Customer> selectionModel = customersTable.getSelectionModel();
         Customer selectedCustomer = selectionModel.getSelectedItem();
-      //  editCustomerViewModel.getServices().updateCustomer(selectedCustomer.getId(),editCustomerViewModel.getServices().addCustomer(selectedCustomer.getId(), nameField.getText(), surnameField.getText(), mailField.getText(), phoneField.getText(), dobField.getValue()).get());
+        editCustomerViewModel.getServices().update( nameField.getText(), surnameField.getText(), mailField.getText(), phoneField.getText(), dobField.getValue(),selectedCustomer.getId()).get();
         customers.clear();
         customers.addAll(editCustomerViewModel.getServices().getAll().get());
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

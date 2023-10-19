@@ -70,7 +70,7 @@ public class CustomerDAOFiles implements CustomerDAO {
             statement.setDate(5, Date.valueOf(dob));
             statement.setInt(6, id);
             statement.executeUpdate();
-            result = Either.right(readRS(statement.getResultSet()).get());
+            result = Either.right(getAll().get());
         } catch (SQLException e) {
             e.printStackTrace();
             result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));

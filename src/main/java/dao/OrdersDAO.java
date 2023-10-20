@@ -22,7 +22,7 @@ public interface OrdersDAO {
     Either<OrderError, List<Order>> get(LocalDate localDate);
 
     Either<OrderError, Order> addOrder(int id, LocalDateTime date, int customer_id, int table_id);
-
+    void deleteOrderItem(int id);
     void delete(int idToDelete);
 
 }

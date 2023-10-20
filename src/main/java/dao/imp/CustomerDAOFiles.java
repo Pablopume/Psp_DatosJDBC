@@ -5,6 +5,7 @@ import dao.CustomerDAO;
 import jakarta.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import model.Customer;
+import model.Order;
 import model.errors.CustomerError;
 import io.vavr.control.Either;
 
@@ -44,6 +45,35 @@ public class CustomerDAOFiles implements CustomerDAO {
         return result;
 
     }
+    public Either<CustomerError, List<Customer>> deleteOrder(int customerId){
+        Either<CustomerError, List<Customer>> result=null;
+        try (Connection myConnection = db.getConnection();
+             PreparedStatement statement = myConnection.prepareStatement("delete from orders where customer_id=?")) {
+            statement.setInt(1, customerId);
+            statement.executeUpdate();
+            result = Either.right(getAll().get());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
+        }
+        return result;
+
+    }
+
+    public Either<CustomerError, List<Customer>> deleteOrderItems(int customerId){
+        Either<CustomerError, List<Customer>> result=null;
+        try (Connection myConnection = db.getConnection();
+             PreparedStatement statement = myConnection.prepareStatement("delete from order_items where order_id in (select order_id from orders where customer_id=?)")) {
+            statement.setInt(1, customerId);
+            statement.executeUpdate();
+            result = Either.right(getAll().get());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
+        }
+        return result;
+
+    }
     public Either<CustomerError, List<Customer>> delete(int id){
         Either<CustomerError, List<Customer>> result=null;
         try (Connection myConnection = db.getConnection();
@@ -54,6 +84,7 @@ public class CustomerDAOFiles implements CustomerDAO {
             else {
                 statement.setInt(1, id);
                 statement.executeUpdate();
+                deleteCredentials(id);
                 result = Either.right(getAll().get());
             }
         } catch (SQLException e) {
@@ -63,6 +94,18 @@ public class CustomerDAOFiles implements CustomerDAO {
         return result;
 
     }
+
+    private void deleteCredentials(int id) {
+        try (Connection myConnection = db.getConnection();
+             PreparedStatement statement = myConnection.prepareStatement("delete from credentials where customer_id=?")){
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public Either<CustomerError, List<Customer>> update( String first_name, String last_name, String email, String phone, LocalDate dob, int id){
         Either<CustomerError, List<Customer>> result=null;
@@ -160,21 +203,20 @@ public class CustomerDAOFiles implements CustomerDAO {
         return result;
     }
     private boolean customerContainOrders(int id) {
-        boolean resultado=false;
+        boolean resultado = false;
         try (Connection myConnection = db.getConnection();
              Statement statement = myConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-                     ResultSet.CONCUR_READ_ONLY)) {
-            ResultSet rs = statement.executeQuery("select * orders where customer_id="+id);
-            if(rs.next()){
-                resultado=true;
+                     ResultSet.CONCUR_READ_ONLY);
+             ResultSet rs = statement.executeQuery("select * from orders where customer_id=" + id)) {
+            if (rs.next()) {
+                resultado = true;
             }
-
-
         } catch (SQLException e) {
             SQLException ex = e.getNextException();
         }
         return resultado;
     }
+
     private Either<CustomerError, List<Customer>> readRS(ResultSet rs) {
         Either<CustomerError, List<Customer>> either;
         try {

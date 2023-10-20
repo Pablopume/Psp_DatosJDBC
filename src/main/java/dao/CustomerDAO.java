@@ -13,5 +13,7 @@ public interface CustomerDAO {
     Either<CustomerError, Customer> add( String first_name, String last_name, String email, String phone, LocalDate dob);
     Either<CustomerError, List<Customer>> update( String first_name, String last_name, String email, String phone, LocalDate dob, int id);
     Either<CustomerError, List<Customer>> delete(int id);
+    Either<CustomerError, List<Customer>> deleteOrder(int customerId);
+    Either<CustomerError, List<Customer>> deleteOrderItems(int customerId);
 }
 

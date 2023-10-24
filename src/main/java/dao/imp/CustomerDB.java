@@ -44,21 +44,57 @@ public class CustomerDB implements CustomerDAO {
         return result;
 
     }
-    public Either<CustomerError, List<Customer>> deleteOrder(int customerId){
-        Either<CustomerError, List<Customer>> result=null;
-        try (Connection myConnection = db.getConnection();
-             PreparedStatement statement = myConnection.prepareStatement("delete from orders where customer_id=?")) {
-            statement.setInt(1, customerId);
-            statement.executeUpdate();
-            result = Either.right(getAll().get());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
+    public Either<CustomerError, Integer> delete(Customer customer, boolean deleteOrders){
+        Either<CustomerError, Integer> result;
+        if (!deleteOrders) {
+            try (Connection con = db.getConnection();
+                 PreparedStatement preparedStatement = con.prepareStatement("DELETE FROM customers WHERE id = ?");
+                 PreparedStatement preparedStatementCredentials = con.prepareStatement("DELETE FROM credentials WHERE customer_id = ?")) {
+                preparedStatement.setInt(1, customer.getId());
+                preparedStatementCredentials.setInt(1, customer.getId());
+                preparedStatementCredentials.executeUpdate();
+                int rs = preparedStatement.executeUpdate();
+
+                if (rs == 0) {
+                    result = Either.left(new CustomerError(1,"Error deleting customer"));
+                } else {
+                    result = Either.right(0);
+                }
+            } catch (SQLException ex) {
+                if (ex.getErrorCode() == 1451) {
+                    result = Either.left(new CustomerError(2, "The customer has orders"));
+                } else {
+                    result = Either.left(new CustomerError(3, "Error connecting to database"));
+                }
+            }
+        } else {
+            try (Connection con = db.getConnection();
+                 PreparedStatement preparedStatement = con.prepareStatement("DELETE FROM order_items WHERE order_id = (SELECT order_id FROM orders WHERE customer_id = ?)");
+                 PreparedStatement preparedStatementDeleteOrders = con.prepareStatement("DELETE FROM orders WHERE customer_id = ?");
+                 PreparedStatement preparedStatementCredentials = con.prepareStatement("DELETE FROM credentials WHERE customer_id = ?");
+                 PreparedStatement preparedStatementCustomer = con.prepareStatement("DELETE FROM customers WHERE id = ?")) {
+                preparedStatement.setInt(1, customer.getId());
+                preparedStatementDeleteOrders.setInt(1, customer.getId());
+                preparedStatement.executeUpdate();
+                preparedStatementDeleteOrders.executeUpdate();
+                preparedStatementCustomer.setInt(1, customer.getId());
+                preparedStatementCredentials.setInt(1, customer.getId());
+                preparedStatementCredentials.executeUpdate();
+
+
+                int rs = preparedStatementCustomer.executeUpdate();
+
+                if (rs == 0) {
+                    result = Either.left(new CustomerError(1, "Error deleting customer"));
+                } else {
+                    result = Either.right(0);
+                }
+            } catch (SQLException ex) {
+                result = Either.left(new CustomerError(3, "Error connecting to database"));
+            }
         }
         return result;
-
     }
-
     public Either<CustomerError, List<Customer>> deleteOrderItems(int customerId){
         Either<CustomerError, List<Customer>> result=null;
         try (Connection myConnection = db.getConnection();

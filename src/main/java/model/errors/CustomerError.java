@@ -1,10 +1,11 @@
 package model.errors;
 
+import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Data
 public sealed class CustomerError permits CustomerErrorEmptyList {
     private final int numError;
     private final String message;

@@ -73,46 +73,60 @@ public class DeleteCustomersController extends BaseScreenController {
     public void deleteCustomer(ActionEvent actionEvent) {
         SelectionModel<Customer> selectionModel = customersTable.getSelectionModel();
         Customer selectedCustomer = selectionModel.getSelectedItem();
-       if (deleteCustomerViewModel.getServices().delete(selectedCustomer.getId()).isLeft()){
-           Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-           alert.setTitle("You can't delete");
-           alert.setHeaderText(null);
-           alert.setContentText("There are orders created in that customer, do you want to delete them?");
-           Optional<ButtonType> result = alert.showAndWait();
-           if (result.isPresent() && result.get() == ButtonType.OK) {
-               deleteCustomerViewModel.getServices().deleteOrderItems(selectedCustomer.getId());
-               deleteCustomerViewModel.getServices().deleteOrder(selectedCustomer.getId());
-               ObservableList<Customer> customers = customersTable.getItems();
-               deleteCustomerViewModel.getServices().delete(selectedCustomer.getId());
-               customers.remove(selectedCustomer);
-
-
-           } else {
-           Alert alert2=new Alert(Alert.AlertType.INFORMATION);
-           alert2.setTitle("Delete cancelled");
-           alert2.setHeaderText(null);
-           alert2.setContentText("You cancelled the delete");
-           alert2.show();
-       }
-       }else {
-           Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-           confirmationAlert.setTitle("Confirm delete");
-           confirmationAlert.setHeaderText("Delete customer");
-           confirmationAlert.setContentText("Are you sure you want to delete this Customer?");
-           Optional<ButtonType> result = confirmationAlert.showAndWait();
-           if (result.isPresent() && result.get() == ButtonType.OK) {
-               deleteCustomerViewModel.getServices().delete(selectedCustomer.getId());
-               ObservableList<Customer> customers = customersTable.getItems();
-               customers.remove(selectedCustomer);
-               Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-               successAlert.setTitle("Customer deleted");
-               successAlert.setHeaderText(null);
-               successAlert.setContentText("The Customer has been deleted");
-               successAlert.showAndWait();
-           }
-       }
-       }
+        if (selectedCustomer != null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.getButtonTypes().remove(ButtonType.OK);
+            alert.getButtonTypes().add(ButtonType.CANCEL);
+            alert.getButtonTypes().add(ButtonType.YES);
+            alert.setTitle("Delete Customer");
+            alert.setContentText("Do you want to delete this customer?");
+            Optional<ButtonType> res = alert.showAndWait();
+            res.ifPresent(buttonType -> {
+                if (buttonType == ButtonType.YES) {
+                    deleteCustomerViewModel.getServices().delete(selectedCustomer, false).peek(customerInt -> {
+                                if (customerInt == 0) {
+                                    Alert a = new Alert(Alert.AlertType.INFORMATION);
+                                    a.setTitle("Customer deleted");
+                                    a.setHeaderText(null);
+                                    a.setContentText("The customer has been deleted successfully");
+                                    a.show();
+                                    customersTable.getItems().remove(selectedCustomer);
+                                }
+                            })
+                            .peekLeft(customerError -> {
+                                if (customerError.getNumError() == 2) {
+                                    Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
+                                    alert2.getButtonTypes().remove(ButtonType.OK);
+                                    alert2.getButtonTypes().add(ButtonType.CANCEL);
+                                    alert2.getButtonTypes().add(ButtonType.YES);
+                                    alert2.setTitle("Delete Customer with orders");
+                                    alert2.setContentText("Do you want to delete this customer and its orders?");
+                                    Optional<ButtonType> res2 = alert2.showAndWait();
+                                    res2.ifPresent(buttonType2 -> {
+                                        if (buttonType2 == ButtonType.YES) {
+                                            deleteCustomerViewModel.getServicesOrder().deleteByCustomerId(selectedCustomer.getId());
+                                            deleteCustomerViewModel.getServices().delete(selectedCustomer, true).peek(result -> {
+                                                        if (result == 0) {
+                                                            Alert a = new Alert(Alert.AlertType.INFORMATION);
+                                                            a.setTitle("Customer deleted");
+                                                            a.setHeaderText(null);
+                                                            a.setContentText("The customer has been deleted");
+                                                            a.show();
+                                                            customersTable.getItems().remove(selectedCustomer);
+                                                        }
+                                                    })
+                                                    .peekLeft(customerError2 -> getPrincipalController().sacarAlertError(customerError2.getMessage()));
+                                        }
+                                    });
+                                } else {
+                                    getPrincipalController().sacarAlertError(customerError.getMessage());
+                                }
+                            });
+                }
+            });
+        }
     }
+}
 
 
 

@@ -59,8 +59,9 @@ public class AddOrderController extends BaseScreenController {
     public void addOrder(ActionEvent actionEvent) {
         int selectedCustomerId = Integer.parseInt(idCustomer.getValue());
         int selectedTableId = Integer.parseInt(table_id.getValue());
+
         //    addOrderViewModel.getServicesDaoXML().writeToXML(new OrderXML(addOrderViewModel.getServices().createOrder(LocalDateTime.now(),selectedCustomerId,selectedTableId).get().getId(),ordersXMLTable.getItems()));
-        addOrderViewModel.getServices().writeToFile(addOrderViewModel.getServices().createOrder( LocalDateTime.now(), selectedCustomerId, selectedTableId).get());
+       addOrderViewModel.getServices().createOrder(LocalDateTime.now(),selectedCustomerId,selectedTableId);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(Constants.ORDER_ADDED);
         alert.setHeaderText(null);

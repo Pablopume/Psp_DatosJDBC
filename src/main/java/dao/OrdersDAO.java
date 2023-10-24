@@ -12,17 +12,19 @@ public interface OrdersDAO {
     Either<OrderError, List<Order>> getAll();
 
     void save(Order order);
+    void delete(Order order);
 
     void updateOrder(int id, Order order);
 
     Either<OrderError, Order> save(LocalDateTime date, int customer_id, int table_id);
 
     Either<OrderError, List<Order>> get(int id);
-
+    Either<OrderError, Integer> update(Order c);
     Either<OrderError, List<Order>> get(LocalDate localDate);
 
     Either<OrderError, Order> addOrder(int id, LocalDateTime date, int customer_id, int table_id);
     void deleteOrderItem(int id);
     void delete(int idToDelete);
+
 
 }

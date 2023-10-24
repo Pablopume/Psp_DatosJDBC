@@ -17,7 +17,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ServicesOrderImpl implements ServicesOrder {
     private OrdersDAO ordersDAO;
@@ -41,8 +43,14 @@ public class ServicesOrderImpl implements ServicesOrder {
         ordersDAO.updateOrder(id, order);
     }
 
+    @Override
+    public void delete(Order order) {
+        ordersDAO.delete(order);
+    }
+
 
     public Either<OrderError, Order> createOrder(LocalDateTime date, int customer_id, int table_id) {
+        System.out.println("hola");
         return ordersDAO.save(date, customer_id, table_id);
     }
 
@@ -93,10 +101,33 @@ public class ServicesOrderImpl implements ServicesOrder {
 
         return false;
     }
+    @Override
+    public List<Order> getOrdersByCustomerId(int id) {
+        Either<OrderError, List<Order>> result = ordersDAO.getAll();
+
+        if (result.isLeft()) {
+            return Collections.emptyList();
+        } else {
+            List<Order> allOrders = result.get();
+            return allOrders.stream()
+                    .filter(order -> order.getCustomer_id() == id)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    public Either<OrderError, Integer> update(Order c) {
+        return ordersDAO.update(c);
+    }
 
     @Override
     public Either<OrderError, Order> addOrder(int id, LocalDateTime date, int customer_id, int table_id) {
         return ordersDAO.addOrder(id, date, customer_id, table_id);
     }
 
+    @Override
+    public void deleteByCustomerId(int id) {
+        List<Order> orders = getOrdersByCustomerId(id);
+        orders.forEach(this::delete);
+    }
 }

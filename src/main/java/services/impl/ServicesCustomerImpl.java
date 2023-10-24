@@ -34,19 +34,10 @@ public class ServicesCustomerImpl implements ServicesCustomer {
     }
 
     @Override
-    public Either<CustomerError, List<Customer>> delete(int id) {
-        return customerDAO.delete(id);
+    public Either<CustomerError, Integer> delete(Customer customer, boolean deleteOrders) {
+        return customerDAO.delete(customer, deleteOrders);
     }
 
-    @Override
-    public Either<CustomerError, List<Customer>> deleteOrder(int customerId) {
-        return customerDAO.deleteOrder(customerId);
-    }
-
-    @Override
-    public Either<CustomerError, List<Customer>> deleteOrderItems(int customerId) {
-        return customerDAO.deleteOrderItems(customerId);
-    }
 
 }
 

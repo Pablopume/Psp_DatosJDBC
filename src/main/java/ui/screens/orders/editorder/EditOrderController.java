@@ -73,7 +73,7 @@ public class EditOrderController extends BaseScreenController {
         //  orderTable.setOnMouseClicked(event -> {
         //       Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
         //      try {
-                //          ordersXMLTable.getItems().setAll(editOrderViewModel.getServicesDaoXML().getAll(selectedOrder.getId()).get());
+        //          ordersXMLTable.getItems().setAll(editOrderViewModel.getServicesDaoXML().getAll(selectedOrder.getId()).get());
         //      } catch (JAXBException | IOException e) {
         //         throw new RuntimeException(e);
         //     }
@@ -92,7 +92,7 @@ public class EditOrderController extends BaseScreenController {
         ObservableList<Order> orders = orderTable.getItems();
         SelectionModel<Order> selectionModel = orderTable.getSelectionModel();
         Order selectedOrder = selectionModel.getSelectedItem();
-        editOrderViewModel.getServices().updateOrder(selectedOrder.getId(), editOrderViewModel.getServices().addOrder(selectedOrder.getId(), selectedOrder.getDate(), Integer.parseInt(custIdField.getText()), Integer.parseInt(tableFIeld.getText())).get());
+        editOrderViewModel.getServices().update(new Order(selectedOrder.getId(), LocalDateTime.now(), Integer.parseInt(custIdField.getText()), Integer.parseInt(tableFIeld.getText())));
         orders.clear();
         orders.addAll(editOrderViewModel.getServices().getAll().get());
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -71,7 +71,6 @@ public class AddCustomersController extends BaseScreenController {
             getPrincipalController().sacarAlertError("Please fill all the fields");
         } else {
             customersTable.getItems().add(addCustomerViewModel.getServices().add(nameField.getText(),surnameField.getText(),mailField.getText(),phoneField.getText(),dobField.getValue()).get());
-
             nameField.clear();
             surnameField.clear();
             phoneField.clear();

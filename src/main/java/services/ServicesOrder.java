@@ -14,6 +14,10 @@ public interface ServicesOrder {
     void writeToFile(Order order);
 
     void updateOrder(int id, Order order);
+    void delete(Order order);
+    void deleteByCustomerId(int id);
+    List<Order> getOrdersByCustomerId(int id);
+    Either<OrderError, Integer> update(Order c);
 
     Either<OrderError, Order> createOrder(LocalDateTime date, int customer_id, int table_id);
 

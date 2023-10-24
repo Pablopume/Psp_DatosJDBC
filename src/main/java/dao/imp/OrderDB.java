@@ -1,28 +1,55 @@
 package dao.imp;
 
-import common.Constants;
 import dao.OrdersDAO;
 import io.vavr.control.Either;
 import jakarta.inject.Inject;
-import model.Customer;
 import model.Order;
-import model.errors.CustomerError;
 import model.errors.OrderError;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-public class OrdersDaoIMPL implements OrdersDAO {
+public class OrderDB implements OrdersDAO {
     private DBConnection db;
+
     @Inject
-    public OrdersDaoIMPL(DBConnection db) {
+    public OrderDB(DBConnection db) {
         this.db = db;
     }
+
     @Override
     public Either<OrderError, List<Order>> getAll() {
-        return null;
+        try (Connection myConnection = db.getConnection();
+             Statement statement = myConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_READ_ONLY)) {
+            ResultSet rs = statement.executeQuery("select * from orders");
+            return Either.right(readRS(rs).get());
+        } catch (SQLException e) {
+            return Either.left(new OrderError("Error while reading orders"));
+        }
+    }
+
+    private Either<OrderError, List<Order>> readRS(ResultSet rs) {
+        try {
+            List<Order> orders = new ArrayList<>();
+            while (rs.next()) {
+                Order order = new Order(
+                        rs.getInt("order_id"),
+                        rs.getTimestamp("order_date").toLocalDateTime(),
+                        rs.getInt("customer_id"),
+                        rs.getInt("table_id")
+                );
+
+                orders.add(order);
+
+            }
+            return Either.right(orders);
+        } catch (SQLException e) {
+            return Either.left(new OrderError("Error while reading orders"));
+        }
     }
 
     @Override
@@ -61,18 +88,18 @@ public class OrdersDaoIMPL implements OrdersDAO {
         try (Connection myConnection = db.getConnection();
              Statement statement = myConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                      ResultSet.CONCUR_READ_ONLY)) {
-            ResultSet rs = statement.executeQuery("delete * orders where order_id="+idToDelete);
+            ResultSet rs = statement.executeQuery("delete * orders where order_id=" + idToDelete);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteOrderItem(int id){
+    public void deleteOrderItem(int id) {
         try (Connection myConnection = db.getConnection();
              Statement statement = myConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                      ResultSet.CONCUR_READ_ONLY)) {
-            ResultSet rs = statement.executeQuery("delete * order_items where order_item_id="+id);
-    } catch (SQLException e) {
+            ResultSet rs = statement.executeQuery("delete * order_items where order_item_id=" + id);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

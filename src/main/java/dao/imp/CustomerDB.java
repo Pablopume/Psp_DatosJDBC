@@ -5,7 +5,6 @@ import dao.CustomerDAO;
 import jakarta.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import model.Customer;
-import model.Order;
 import model.errors.CustomerError;
 import io.vavr.control.Either;
 
@@ -17,11 +16,11 @@ import java.util.List;
 
 
 @Log4j2
-public class CustomerDAOFiles implements CustomerDAO {
+public class CustomerDB implements CustomerDAO {
     private DBConnection db;
 
     @Inject
-    public CustomerDAOFiles(DBConnection db) {
+    public CustomerDB(DBConnection db) {
         this.db = db;
     }
     public Either<CustomerError, List<Customer>> add(Customer customer){

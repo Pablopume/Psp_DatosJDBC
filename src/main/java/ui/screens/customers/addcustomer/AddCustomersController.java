@@ -70,7 +70,7 @@ public class AddCustomersController extends BaseScreenController {
         if (nameField.getText().isEmpty() || surnameField.getText().isEmpty() || phoneField.getText().isEmpty() || mailField.getText().isEmpty() || dobField.getValue() == null) {
             getPrincipalController().sacarAlertError("Please fill all the fields");
         } else {
-            customersTable.getItems().add(addCustomerViewModel.getServices().add(nameField.getText(),surnameField.getText(),mailField.getText(),phoneField.getText(),dobField.getValue()).get());
+            customersTable.getItems().setAll(addCustomerViewModel.getServices().add(new Customer(nameField.getText(),surnameField.getText(),mailField.getText(),phoneField.getText(),dobField.getValue())).get());
             nameField.clear();
             surnameField.clear();
             phoneField.clear();

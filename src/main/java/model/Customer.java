@@ -16,6 +16,14 @@ public class Customer {
     private String phone;
     private LocalDate dob;
 
+    public Customer(String first_name, String last_name, String email, String phone, LocalDate dob) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.email = email;
+        this.phone = phone;
+        this.dob = dob;
+    }
+
     public Customer(String fileLine) {
         String[] elemArray = fileLine.split(";");
         this.id = Integer.parseInt(elemArray[0]);

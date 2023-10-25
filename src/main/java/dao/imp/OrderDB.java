@@ -68,10 +68,7 @@ public class OrderDB implements OrdersDAO {
         }
     }
 
-    @Override
-    public void save(Order order) {
 
-    }
     public Either<OrderError, Integer> update(Order c) {
         Either<OrderError, Integer> result;
         try(Connection con = db.getConnection();

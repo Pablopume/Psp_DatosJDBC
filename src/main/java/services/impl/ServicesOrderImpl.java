@@ -33,10 +33,7 @@ public class ServicesOrderImpl implements ServicesOrder {
         return ordersDAO.getAll();
     }
 
-    @Override
-    public void writeToFile(Order order) {
-        ordersDAO.save(order);
-    }
+
 
     @Override
     public void updateOrder(int id, Order order) {

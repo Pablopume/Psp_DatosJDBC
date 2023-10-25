@@ -5,13 +5,11 @@ import io.vavr.control.Either;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import model.Customer;
-import model.Order;
 import model.errors.CustomerError;
 import services.ServicesCustomer;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class ServicesCustomerImpl implements ServicesCustomer {
@@ -26,11 +24,11 @@ public class ServicesCustomerImpl implements ServicesCustomer {
     public Either<CustomerError, List<Customer>> getAll() {
         return customerDAO.getAll();
     }
-   public Either<CustomerError, Customer> add( String first_name, String last_name, String email, String phone, LocalDate dob){
-        return customerDAO.add(first_name, last_name, email, phone, dob);
+   public Either<CustomerError, List<Customer>> add(Customer customer){
+        return customerDAO.add(customer);
    }
-   public Either<CustomerError, List<Customer>> update( String first_name, String last_name, String email, String phone, LocalDate dob, int id){
-        return customerDAO.update(first_name, last_name, email, phone, dob, id);
+   public Either<CustomerError, List<Customer>> update(Customer customer){
+        return customerDAO.update(customer);
     }
 
     @Override

@@ -104,7 +104,6 @@ public class DeleteCustomersController extends BaseScreenController {
                                     Optional<ButtonType> res2 = alert2.showAndWait();
                                     res2.ifPresent(buttonType2 -> {
                                         if (buttonType2 == ButtonType.YES) {
-                                            deleteCustomerViewModel.getServicesOrder().deleteByCustomerId(selectedCustomer.getId());
                                             deleteCustomerViewModel.getServices().delete(selectedCustomer, true).peek(result -> {
                                                         if (result == 0) {
                                                             Alert a = new Alert(Alert.AlertType.INFORMATION);

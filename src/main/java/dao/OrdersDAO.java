@@ -11,7 +11,7 @@ import java.util.List;
 public interface OrdersDAO {
     Either<OrderError, List<Order>> getAll();
 
-    void save(Order order);
+
     void delete(Order order);
 
     void updateOrder(int id, Order order);

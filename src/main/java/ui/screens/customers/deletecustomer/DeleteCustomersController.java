@@ -37,6 +37,11 @@ public class DeleteCustomersController extends BaseScreenController {
     public TableColumn product;
     public TableColumn idProduct;
     public TableColumn price;
+    public TableView<Order> orderssTable;
+    public TableColumn<Order, Integer> idOrder;
+    public TableColumn<Order, LocalDate> orderDate;
+    public TableColumn<Order, Integer> customerId;
+    public TableColumn<Order, Integer> tableId;
 
     @Inject
     private DeleteCustomerViewModel deleteCustomerViewModel;
@@ -48,6 +53,10 @@ public class DeleteCustomersController extends BaseScreenController {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>(Constants.EMAIL2));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>(Constants.PHONE2));
         dateOfBirthdayColumn.setCellValueFactory(new PropertyValueFactory<>(Constants.DOB2));
+        idOrder.setCellValueFactory(new PropertyValueFactory<>(Constants.ID));
+        orderDate.setCellValueFactory(new PropertyValueFactory<>(Constants.DATE));
+        customerId.setCellValueFactory(new PropertyValueFactory<>(Constants.CUSTOMER_ID));
+        tableId.setCellValueFactory(new PropertyValueFactory<>(Constants.TABLE_ID));
         deleteCustomerViewModel.getState().addListener((observableValue, oldValue, newValue) -> {
 
                     if (newValue.getError() != null) {
@@ -61,6 +70,14 @@ public class DeleteCustomersController extends BaseScreenController {
                 }
 
         );
+        customersTable.setOnMouseClicked(event -> {
+            SelectionModel<Customer> selectionModel = customersTable.getSelectionModel();
+            Customer selectedCustomer = selectionModel.getSelectedItem();
+            if (selectedCustomer != null) {
+                orderssTable.getItems().clear();
+                orderssTable.getItems().addAll(deleteCustomerViewModel.getServicesOrder().getOrdersByCustomerId(selectedCustomer.getId()));
+            }
+        });
         deleteCustomerViewModel.voidState();
 
     }
@@ -73,6 +90,7 @@ public class DeleteCustomersController extends BaseScreenController {
     public void deleteCustomer(ActionEvent actionEvent) {
         SelectionModel<Customer> selectionModel = customersTable.getSelectionModel();
         Customer selectedCustomer = selectionModel.getSelectedItem();
+
         if (selectedCustomer != null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.getButtonTypes().remove(ButtonType.OK);

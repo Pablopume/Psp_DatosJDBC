@@ -6,17 +6,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import model.Customer;
 import model.errors.CustomerError;
-import services.ServicesCustomer;
+import services.CustomerServices;
 
-import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Singleton
-public class ServicesCustomerImpl implements ServicesCustomer {
+public class CustomerServicesImpl implements CustomerServices {
     private final CustomerDAO customerDAO;
 
     @Inject
-    public ServicesCustomerImpl(CustomerDAO customerDAO) {
+    public CustomerServicesImpl(CustomerDAO customerDAO) {
         this.customerDAO = customerDAO;
     }
 
@@ -36,6 +36,23 @@ public class ServicesCustomerImpl implements ServicesCustomer {
         return customerDAO.delete(customer, deleteOrders);
     }
 
+    @Override
+    public int newId() {
+        List<Customer> customers = customerDAO.getAll().get();
+        customers.sort(Comparator.comparing(Customer::getId));
+        return customers.get(customers.size() - 1).getId() + 1;
+    }
+
+    public String getNameById(int id){
+        List<Customer> customers = customerDAO.getAll().get();
+        String name = "";
+        for (Customer customer : customers) {
+            if (customer.getId() == id) {
+                name= customer.getFirst_name();
+            }
+        }
+        return name;
+    }
 
 }
 

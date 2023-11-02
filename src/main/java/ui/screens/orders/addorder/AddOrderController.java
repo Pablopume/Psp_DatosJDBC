@@ -57,28 +57,32 @@ public class AddOrderController extends BaseScreenController {
     }
 
     public void addOrder(ActionEvent actionEvent) {
-        int selectedCustomerId = Integer.parseInt(idCustomer.getValue());
-        int selectedTableId = Integer.parseInt(table_id.getValue());
-
-        //    addOrderViewModel.getServicesDaoXML().writeToXML(new OrderXML(addOrderViewModel.getServices().createOrder(LocalDateTime.now(),selectedCustomerId,selectedTableId).get().getId(),ordersXMLTable.getItems()));
-       addOrderViewModel.getServices().createOrder(LocalDateTime.now(),selectedCustomerId,selectedTableId);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(Constants.ORDER_ADDED);
-        alert.setHeaderText(null);
-        alert.setContentText(Constants.THE_ORDER_HAS_BEEN_ADDED);
-        alert.showAndWait();
-
+        try {
+            int selectedCustomerId = Integer.parseInt(idCustomer.getValue());
+            int selectedTableId = Integer.parseInt(table_id.getValue());
+            addOrderViewModel.getServices().createOrder(new Order(LocalDateTime.now(),selectedCustomerId,selectedTableId));
+            addOrderViewModel.getOrderItemService().save(ordersXMLTable.getItems());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(Constants.ORDER_ADDED);
+            alert.setHeaderText(null);
+            alert.setContentText(Constants.THE_ORDER_HAS_BEEN_ADDED);
+            alert.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void addItem(ActionEvent actionEvent) {
-        //  ObservableList<OrderItemXML> orderItemXMLS= ordersXMLTable.getItems();
-        //  orderItemXMLS.add(new OrderItemXML(menuItems.getValue(),Integer.parseInt(quantityItems.getText())));
+         ObservableList<OrderItem> orderItem= ordersXMLTable.getItems();
+          orderItem.add(new OrderItem(addOrderViewModel.getOrderItemService().getAutoId(),addOrderViewModel.getServices().getLastId()+1,addOrderViewModel.getMenuItemService().getByName(menuItems.getValue()),Integer.parseInt(quantityItems.getText())));
+          ordersXMLTable.setItems(orderItem);
     }
 
     public void removeOrder(ActionEvent actionEvent) {
 
-       // ObservableList<OrderItemXML> orderItemXMLS= ordersXMLTable.getItems();
-        // OrderItemXML selectedOrder = ordersXMLTable.getSelectionModel().getSelectedItem();
-        //  orderItemXMLS.remove(selectedOrder);
+        ObservableList<OrderItem> orderItemXMLS= ordersXMLTable.getItems();
+        OrderItem selectedOrder = ordersXMLTable.getSelectionModel().getSelectedItem();
+          orderItemXMLS.remove(selectedOrder);
+          ordersXMLTable.setItems(orderItemXMLS);
     }
 }

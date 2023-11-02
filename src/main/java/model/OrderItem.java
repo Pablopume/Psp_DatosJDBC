@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItem {
-private String menuItem;
-private int quantity;
+    private int id;
+    private int idOrder;
+    private MenuItem  menuItem;
+    private int quantity;
 
 }

@@ -17,6 +17,9 @@ module javafx {
     requires jakarta.xml.bind;
     requires io.vavr;
     requires java.sql;
+    requires com.zaxxer.hikari;
+    requires commons.dbcp2;
+    requires jakarta.annotation;
 
     exports ui.screens.orders.deleteorders;
     exports services.impl;

@@ -24,7 +24,7 @@
         </columns>
     </TableView>
 
-    <TableView fx:id="ordersTable" layoutX="395.0" layoutY="46.0" prefHeight="297.0" prefWidth="191.0">
+    <TableView fx:id="ordersTable" layoutX="395.0" layoutY="59.0" prefHeight="284.0" prefWidth="191.0">
         <columns>
             <TableColumn fx:id="menuItem" prefWidth="100.0" text="Menu item" />
             <TableColumn fx:id="quantity" prefWidth="90.0" text="Quantity" />

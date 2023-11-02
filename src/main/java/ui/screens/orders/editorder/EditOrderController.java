@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.Data;
 import model.Customer;
+import model.MenuItem;
 import model.Order;
 import model.OrderItem;
 import ui.screens.common.BaseScreenController;
@@ -35,6 +36,8 @@ public class EditOrderController extends BaseScreenController {
     public TableView<OrderItem> ordersXMLTable;
     public TableColumn<OrderItem, String> menuItem;
     public TableColumn<OrderItem, Integer> quantity;
+    public TextField quantityItems;
+    public ComboBox<String> menuItems;
 
     @Inject
     EditOrderViewModel editOrderViewModel;
@@ -46,6 +49,14 @@ public class EditOrderController extends BaseScreenController {
         tableId.setCellValueFactory(new PropertyValueFactory<>(Constants.TABLE_ID));
         menuItem.setCellValueFactory(new PropertyValueFactory<>("menuItem"));
         quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        orderTable.setOnMouseClicked(event -> {
+            Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
+
+            ordersXMLTable.getItems().setAll(editOrderViewModel.getOrderItemService().getOrdersById(selectedOrder.getId()));
+
+
+
+        });
         orderTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
 
@@ -93,6 +104,7 @@ public class EditOrderController extends BaseScreenController {
         SelectionModel<Order> selectionModel = orderTable.getSelectionModel();
         Order selectedOrder = selectionModel.getSelectedItem();
         editOrderViewModel.getServices().update(new Order(selectedOrder.getId(), LocalDateTime.now(), Integer.parseInt(custIdField.getText()), Integer.parseInt(tableFIeld.getText())));
+        editOrderViewModel.getOrderItemService().update(ordersXMLTable.getItems());
         orders.clear();
         orders.addAll(editOrderViewModel.getServices().getAll().get());
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -100,5 +112,19 @@ public class EditOrderController extends BaseScreenController {
         alert.setHeaderText(null);
         alert.setContentText(Constants.ORDER_EDITED_CORRECTLY);
         alert.showAndWait();
+    }
+
+    public void addOrder(ActionEvent actionEvent) {
+        OrderItem selectedOrderItem= ordersXMLTable.getSelectionModel().getSelectedItem();
+        ObservableList<OrderItem> orderItem= ordersXMLTable.getItems();
+        orderItem.add(new OrderItem(selectedOrderItem.getId(),selectedOrderItem.getIdOrder(),editOrderViewModel.getMenuItemService().getByName(menuItems.getValue()),Integer.parseInt(quantityItems.getText())));
+        ordersXMLTable.setItems(orderItem);
+    }
+
+    public void deleteOrder(ActionEvent actionEvent) {
+        ObservableList<OrderItem> orderItemXMLS= ordersXMLTable.getItems();
+        OrderItem selectedOrder = ordersXMLTable.getSelectionModel().getSelectedItem();
+        orderItemXMLS.remove(selectedOrder);
+        ordersXMLTable.setItems(orderItemXMLS);
     }
 }

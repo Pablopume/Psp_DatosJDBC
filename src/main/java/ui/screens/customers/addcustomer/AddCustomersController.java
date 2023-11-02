@@ -69,8 +69,11 @@ public class AddCustomersController extends BaseScreenController {
     public void addClient(ActionEvent actionEvent) {
         if (nameField.getText().isEmpty() || surnameField.getText().isEmpty() || phoneField.getText().isEmpty() || mailField.getText().isEmpty() || dobField.getValue() == null) {
             getPrincipalController().sacarAlertError("Please fill all the fields");
+
         } else {
-            customersTable.getItems().setAll(addCustomerViewModel.getServices().add(new Customer(nameField.getText(),surnameField.getText(),mailField.getText(),phoneField.getText(),dobField.getValue())).get());
+
+            addCustomerViewModel.getServices().add(new Customer(addCustomerViewModel.getServices().newId(),nameField.getText(),surnameField.getText(),mailField.getText(),phoneField.getText(),dobField.getValue()));
+            customersTable.getItems().setAll(addCustomerViewModel.getServices().getAll().get());
             nameField.clear();
             surnameField.clear();
             phoneField.clear();

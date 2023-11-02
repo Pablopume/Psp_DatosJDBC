@@ -7,17 +7,17 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Data;
 import model.Customer;
-import services.ServicesCustomer;
+import services.CustomerServices;
 
 import java.util.ArrayList;
 import java.util.List;
 @Data
 public class AddCustomerViewModel {
-    private final ServicesCustomer services;
+    private final CustomerServices services;
     private final ObjectProperty<AddCustomerState> state;
 
     @Inject
-    public AddCustomerViewModel(ServicesCustomer services) {
+    public AddCustomerViewModel(CustomerServices services) {
         this.services = services;
         this.state = new SimpleObjectProperty<>(new AddCustomerState(new ArrayList<>(), null));
         ;

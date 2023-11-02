@@ -57,15 +57,11 @@ public class DeleteOrderController extends BaseScreenController {
                 }
 
         );
-        //    ordersTable.setOnMouseClicked(event -> {
-        //    Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
-        // try {
+        ordersTable.setOnMouseClicked(event -> {
+            Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
+            ordersXMLTable.getItems().setAll(deleteOrderViewModel.getOrderItemService().getOrdersById(selectedOrder.getId()));
 
-        //          ordersXMLTable.getItems().setAll(deleteOrderViewModel.getServicesDaoXML().getAll(selectedOrder.getId()).get());
-        // } catch (JAXBException | IOException e) {
-        //             throw new RuntimeException(e);
-        // }
-        // });
+        });
         deleteOrderViewModel.voidState();
 
     }

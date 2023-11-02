@@ -6,16 +6,19 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Data;
 import model.Customer;
-import services.ServicesCustomer;
+import services.MenuItemService;
+import services.CustomerServices;
 
 import java.util.ArrayList;
 import java.util.List;
 @Data
 public class EditCustomerViewModel {
-    private final ServicesCustomer services;
+    private final MenuItemService menuItemService;
+    private final CustomerServices services;
     private final ObjectProperty<EditCustomerState> state;
     @Inject
-    public EditCustomerViewModel(ServicesCustomer services) {
+    public EditCustomerViewModel(MenuItemService menuItemService, CustomerServices services) {
+        this.menuItemService = menuItemService;
         this.services = services;
         this.state =  new SimpleObjectProperty<>(new EditCustomerState(new ArrayList<>(), null));;
     }

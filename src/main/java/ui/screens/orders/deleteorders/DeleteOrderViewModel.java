@@ -7,19 +7,22 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Data;
 import model.Order;
-import services.ServicesOrder;
+import services.OrderItemService;
+import services.OrderServices;
 
 import java.util.ArrayList;
 import java.util.List;
 @Data
 public class DeleteOrderViewModel {
-    private final ServicesOrder services;
+    private final OrderServices services;
+    private final OrderItemService orderItemService;
     private final ObjectProperty<DeleteOrderState> state;
 
 
 
     @Inject
-    public DeleteOrderViewModel( ServicesOrder services) {
+    public DeleteOrderViewModel(OrderServices services, OrderItemService orderItemService) {
+        this.orderItemService = orderItemService;
 
         this.state = new SimpleObjectProperty<>(new DeleteOrderState(new ArrayList<>(), null));
         this.services = services;

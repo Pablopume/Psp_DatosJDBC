@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import model.Customer;
 import model.errors.CustomerError;
 import io.vavr.control.Either;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,33 +15,65 @@ import java.util.List;
 
 @Log4j2
 public class CustomerDB implements CustomerDAO {
-    private DBConnection db;
+    private final DBConnection db;
 
     @Inject
     public CustomerDB(DBConnection db) {
         this.db = db;
     }
-// Al hacer el add hay que añadir las credentials con un Autocommit(false) y un commit al final
+
     public Either<CustomerError, List<Customer>> add(Customer customer) {
         Either<CustomerError, List<Customer>> result = null;
-        try (Connection myConnection = db.getConnection();
-             PreparedStatement statement = myConnection.prepareStatement("insert into customers (first_name, last_name, email, phone, date_of_birth) values (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, customer.getFirst_name());
-            statement.setString(2, customer.getLast_name());
-            statement.setString(3, customer.getEmail());
-            statement.setString(4, customer.getPhone());
-            statement.setDate(5, Date.valueOf(customer.getDob()));
-            statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
-            rs.next();
-            customer.setId(rs.getInt(1));
-            result = Either.right(getAll().get());
+        Connection myConnection = null;
+
+        try {
+            myConnection = db.getConnection();
+            myConnection.setAutoCommit(false);
+
+            try (PreparedStatement credentialsStatement = myConnection.prepareStatement("insert into credentials (id, user_name, password) values (?,?,?)")) {
+                credentialsStatement.setInt(1, customer.getId());
+                credentialsStatement.setString(2, customer.getFirst_name());
+                credentialsStatement.setString(3, customer.getFirst_name().toLowerCase());
+                credentialsStatement.executeUpdate();
+
+                myConnection.commit();
+
+                result = Either.right(getAll().get());
+                try (PreparedStatement statement = myConnection.prepareStatement("insert into customers (id, first_name, last_name, email, phone, date_of_birth) values (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+                    statement.setInt(1, customer.getId());
+                    statement.setString(2, customer.getFirst_name());
+                    statement.setString(3, customer.getLast_name());
+                    statement.setString(4, customer.getEmail());
+                    statement.setString(5, customer.getPhone());
+                    statement.setDate(6, Date.valueOf(customer.getDob()));
+                    statement.executeUpdate();
+                    ResultSet rs = statement.getGeneratedKeys();
+                    rs.next();
+
+                }
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (myConnection != null) {
+                try {
+                    myConnection.rollback();
+                } catch (SQLException excep) {
+                    excep.printStackTrace();
+                }
+            }
             result = Either.left(new CustomerError(0, Constants.ERROR_WHILE_RETRIEVING_ORDERS));
+        } finally {
+            if (myConnection != null) {
+                try {
+                    myConnection.setAutoCommit(true);
+                    myConnection.close();
+                } catch (SQLException excep) {
+                    excep.printStackTrace();
+                }
+            }
         }
         return result;
     }
+
 
     public Either<CustomerError, Integer> delete(Customer customer, boolean delete) {
         Either<CustomerError, Integer> result;
@@ -169,4 +202,6 @@ public class CustomerDB implements CustomerDAO {
         }
         return result;
     }
+
+
 }

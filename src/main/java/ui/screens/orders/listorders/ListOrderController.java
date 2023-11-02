@@ -6,9 +6,11 @@ import jakarta.xml.bind.JAXBException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import model.MenuItem;
 import model.Order;
 import model.OrderItem;
 import ui.screens.common.BaseScreenController;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -47,13 +49,14 @@ public class ListOrderController extends BaseScreenController {
         tableId.setCellValueFactory(new PropertyValueFactory<>(Constants.TABLE_ID));
         menuItem.setCellValueFactory(new PropertyValueFactory<>("menuItem"));
         quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
         filterOptions();
         customerTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue == null || newValue.trim().isEmpty()) {
                         customersTable.getItems().setAll(listOrderViewModel.getServices().getAll().get());
                     } else {
                         customersTable.getItems().clear();
-                        customersTable.getItems().setAll(listOrderViewModel.getServices().filteredList(Integer.parseInt(customerTextField.getText())).get());
+                        customersTable.getItems().setAll(listOrderViewModel.getServices().getOrdersByCustomerId(Integer.parseInt(customerTextField.getText())));
                     }
                 }
         );
@@ -78,18 +81,16 @@ public class ListOrderController extends BaseScreenController {
                     }
                 }
         );
-        //     customersTable.setOnMouseClicked(event -> {
-        //         Order selectedOrder = customersTable.getSelectionModel().getSelectedItem();
-        //       try {
-        //         ordersTable.getItems().setAll(listOrderViewModel.getServicesDaoXML().getAll(selectedOrder.getId()).get());
-        //          nameCustomer.setText(listOrderViewModel.getServicesCustomer().getNameById(selectedOrder.getCustomer_id()).get());
-        //    } catch (JAXBException | IOException e) {
-        //        throw new RuntimeException(e);
-        //    }
-        //    });
+        customersTable.setOnMouseClicked(event -> {
+            Order selectedOrder = customersTable.getSelectionModel().getSelectedItem();
 
-        listOrderViewModel.voidState();
+            ordersTable.getItems().setAll(listOrderViewModel.getOrderItemService().getOrdersById(selectedOrder.getId()));
+                nameCustomer.setText(listOrderViewModel.getServicesCustomer().getNameById(selectedOrder.getCustomer_id()));
 
+            listOrderViewModel.voidState();
+
+
+        });
     }
 
     private void filterOptions() {
@@ -104,7 +105,6 @@ public class ListOrderController extends BaseScreenController {
             }
         });
     }
-
 
 
     @Override

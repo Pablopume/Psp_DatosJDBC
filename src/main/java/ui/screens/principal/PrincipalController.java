@@ -22,6 +22,11 @@ import java.util.Optional;
 
 @Log4j2
 public class PrincipalController {
+
+    public MenuItem addOrders;
+    public Menu menuCustomers;
+    public MenuItem deleteOrders;
+
     private Credentials actualUser;
     @FXML
     private Menu menuHelp;
@@ -60,7 +65,6 @@ public class PrincipalController {
         alert.setContentText(mensaje);
         alert.getDialogPane().setId(Constants.ALERT);
         alert.getDialogPane().lookupButton(ButtonType.OK).setId(Constants.BTN_OK);
-        //alert.getDialogPane().lookupButton(ButtonType.CANCEL).setId("btn-cancel");
         alert.showAndWait();
     }
 
@@ -172,6 +176,14 @@ public class PrincipalController {
     public void onLoginDone(Credentials usuario) {
         actualUser = usuario;
         menuPrincipal.setVisible(true);
+        if(usuario.getId()==-1){
+            addOrders.setVisible(false);
+        }else {
+            addOrders.setVisible(true);
+            menuCustomers.setVisible(false);
+            deleteOrders.setVisible(false);
+
+        }
 
         //menuHelp.setVisible(false);
 

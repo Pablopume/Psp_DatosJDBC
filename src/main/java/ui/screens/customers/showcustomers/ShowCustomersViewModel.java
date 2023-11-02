@@ -6,18 +6,18 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import model.Customer;
-import services.ServicesCustomer;
+import services.CustomerServices;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowCustomersViewModel {
 
-    private final ServicesCustomer services;
+    private final CustomerServices services;
     private final ObjectProperty<ShowCustomersState> state;
 
     @Inject
-    public ShowCustomersViewModel(ServicesCustomer services) {
+    public ShowCustomersViewModel(CustomerServices services) {
         this.state = new SimpleObjectProperty<>(new ShowCustomersState(new ArrayList<>(), null));
         this.services = services;
 
